@@ -1,55 +1,34 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <set>
-#include <algorithm>
-#include <map>
-#include <limits> // Required for numeric_limits
-#include <list> // For Question 7
+#include <bits/stdc++.h>
+using namespace std;
 
-// --- Question 1 ---
-// Implements the function to return the longest string matching the given conditions:
-// 1. Non-repetitive identical characters (e.g., 'AABCD' is not valid due to 'AA').
-// 2. Contains only characters from a given list of valid characters.
-std::string getLongestString(const std::string& validCharacters, const std::vector<std::string>& strings) {
-    // Use a set for efficient lookup of valid characters.
-    std::set<char> validCharsSet(validCharacters.begin(), validCharacters.end());
-    std::string longestValidString = ""; // Initialize with an empty string
-
-    // Iterate through each string in the input array.
-    for (const std::string& s : strings) {
-        bool isValid = true; // Flag to track if the current string is valid
-
-        // Condition 1: Check for repetitive identical characters.
-        for (size_t i = 0; i < s.length(); ++i) {
-            // If the current character is the same as the next character, it's invalid.
-            if (i + 1 < s.length() && s[i] == s[i+1]) {
-                isValid = false;
-                break; // No need to check further, move to the next string.
-            }
-        }
-
-        // If the string failed condition 1, skip to the next string.
-        if (!isValid) {
-            continue;
-        }
-
-        // Condition 2: Check if all characters are in the valid characters list.
-        for (char c : s) {
-            // If a character is not found in the valid characters set, it's invalid.
-            if (validCharsSet.find(c) == validCharsSet.end()) {
-                isValid = false;
-                break; // No need to check further, move to the next string.
-            }
-        }
-
-        // If the string is valid (passed both conditions).
-        if (isValid) {
-            // Compare its length with the current longest valid string.
-            if (s.length() > longestValidString.length()) {
-                longestValidString = s; // Update if the current string is longer.
-            }
-        }
+// This function checks if a word follows the given rules
+bool isValid(const string& s, const unordered_set<char>& valid) {
+    for (size_t i = 0; i < s.size(); ++i) {
+        // rule 1: no same letters next to each other
+        if (i && s[i] == s[i - 1]) return false;
+        // rule 2: must be in the list of allowed characters
+        if (!valid.count(s[i])) return false;
     }
-    return longestValidString; // Return the longest valid string found.
+    return true;
+}
+
+// This function finds the longest word that passes the rules
+string getLongestString(const vector<char>& chars,
+                        const vector<string>& candidates) {
+    unordered_set<char> valid(chars.begin(), chars.end());
+    string longest;
+
+    for (const string& w : candidates) {
+        // if it's valid and longer than what we have, we save it
+        if (isValid(w, valid) && w.size() > longest.size())
+            longest = w;
+    }
+    return longest;
+}
+
+// test run 
+int main() {
+    vector<char> chars = {'A','B','C','D'};
+    vector<string> list = {"AABCDA", "ABCDZADC", "ABCDBCA", "ABCDABDCA"};
+    cout << getLongestString(chars, list) << '\n'; // should print ABCDABDCA
 }
